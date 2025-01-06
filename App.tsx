@@ -1,15 +1,19 @@
 /* eslint-disable camelcase */
-import { StatusBar, View } from 'react-native'
+import { StatusBar } from 'react-native'
 
 import {
   useFonts,
   Roboto_700Bold,
   Roboto_400Regular,
 } from '@expo-google-fonts/roboto'
+import { GluestackUIProvider } from '@gluestack-ui/themed'
 
 import { config } from './config/gluestack-ui.config'
 
-import { GluestackUIProvider, Text, Center } from '@gluestack-ui/themed'
+import { SignIn } from '@screens/SignIn'
+
+import { Loading } from '@components/Loading'
+import { SignUp } from '@screens/SignUp'
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -25,15 +29,7 @@ export default function App() {
         translucent
       />
 
-      {fontsLoaded ? (
-        <Center flex={1} bg="$gray700">
-          <Text color="white" fontSize={34}>
-            Home
-          </Text>
-        </Center>
-      ) : (
-        <View />
-      )}
+      {fontsLoaded ? <SignUp /> : <Loading />}
     </GluestackUIProvider>
   )
 }
