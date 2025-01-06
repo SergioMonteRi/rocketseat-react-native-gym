@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@expo-google-fonts/roboto": "^0.2.3",
+    "@rocketseat/eslint-config": "^2.2.2",
+    "eslint": "^8.57.1",
     "expo": "~52.0.23",
     "expo-font": "~13.0.2",
     "expo-status-bar": "~2.0.0",
