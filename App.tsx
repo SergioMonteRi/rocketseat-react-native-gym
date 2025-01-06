@@ -12,7 +12,6 @@ export default function App() {
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: "#202020" }}>
       <StatusBar barStyle="light-content" backgroundColor={"transparent"} translucent  />
 
-
       {fontsLoaded ? <Text>Home</Text> : <View />}
     </View>
   );
