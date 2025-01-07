@@ -1,10 +1,13 @@
+import { useNavigation } from '@react-navigation/native'
+
 import {
+  Text,
   Image,
   VStack,
   Center,
-  Text,
   Heading,
   ScrollView,
+  Box,
 } from '@gluestack-ui/themed'
 
 import { Input } from '@components/Input'
@@ -14,12 +17,18 @@ import Logo from '@assets/logo.svg'
 import BackgroundImg from '@assets/background.png'
 
 export const SignUp = () => {
+  const navigator = useNavigation()
+
+  const handleBackNavigation = () => {
+    navigator.goBack()
+  }
+
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ flexGrow: 1 }}
     >
-      <VStack flex={1} bg={'$gray700'}>
+      <VStack flex={1}>
         <Image
           w={'$full'}
           h={624}
@@ -37,8 +46,10 @@ export const SignUp = () => {
             </Text>
           </Center>
 
-          <Center flex={1} gap={'$2'}>
-            <Heading color={'$gray100'}>Crie sua conta</Heading>
+          <Box gap={'$2'} flex={1}>
+            <Heading color={'$gray100'} textAlign={'center'}>
+              Crie sua conta
+            </Heading>
 
             <Input
               placeholder="Email"
@@ -51,9 +62,14 @@ export const SignUp = () => {
             <Input placeholder={'Senha'} secureTextEntry />
 
             <Button title={'Criar e acessar'} />
-          </Center>
+          </Box>
 
-          <Button title={'Voltar para login'} variant={'outline'} mt={'$12'} />
+          <Button
+            mt={'$12'}
+            variant={'outline'}
+            title={'Voltar para login'}
+            onPress={handleBackNavigation}
+          />
         </VStack>
       </VStack>
     </ScrollView>
