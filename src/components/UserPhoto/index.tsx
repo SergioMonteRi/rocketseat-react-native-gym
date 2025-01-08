@@ -7,11 +7,11 @@ export const UserPhoto = (props: UserPhotoProps) => {
 
   return (
     <Image
+      alt={props.alt}
       rounded={'$full'}
       borderWidth={'$2'}
       borderColor={'$gray400'}
       backgroundColor={'$gray500'}
-      alt={props.alt}
       {...rest}
     />
   )

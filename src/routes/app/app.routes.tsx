@@ -1,8 +1,5 @@
 import { Platform } from 'react-native'
-import {
-  BottomTabBar,
-  createBottomTabNavigator,
-} from '@react-navigation/bottom-tabs'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
 import { Home } from '@screens/Home'
 import { History } from '@screens/History'
@@ -23,18 +20,6 @@ export const AppRoutes = () => {
 
   return (
     <Navigator
-      tabBar={(props) => {
-        const filteredRoutes = props.state.routes.filter(
-          (route) => route.name !== 'exercise',
-        )
-
-        return (
-          <BottomTabBar
-            {...props}
-            state={{ ...props.state, routes: filteredRoutes }}
-          />
-        )
-      }}
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
@@ -50,11 +35,11 @@ export const AppRoutes = () => {
       }}
     >
       <Screen
-        name="history"
-        component={History}
+        name="home"
+        component={Home}
         options={{
           tabBarIcon: ({ color }) => (
-            <AppRoutesIcons.history
+            <AppRoutesIcons.home
               fill={color}
               width={iconSize}
               height={iconSize}
@@ -62,12 +47,13 @@ export const AppRoutes = () => {
           ),
         }}
       />
+
       <Screen
-        name="home"
-        component={Home}
+        name="history"
+        component={History}
         options={{
           tabBarIcon: ({ color }) => (
-            <AppRoutesIcons.home
+            <AppRoutesIcons.history
               fill={color}
               width={iconSize}
               height={iconSize}
@@ -89,12 +75,12 @@ export const AppRoutes = () => {
           ),
         }}
       />
+
       <Screen
         name="exercise"
         component={Exercise}
         options={{
           tabBarButton: () => null,
-          tabBarStyle: { display: 'none' },
         }}
       />
     </Navigator>

@@ -1,54 +1,63 @@
 import { useState } from 'react'
 import { FlatList } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
 import { Heading, HStack, Text, VStack } from '@gluestack-ui/themed'
 
 import { HomeHeader } from '@components/HomeHeader'
 import { MuscleGroup } from '@components/MuscleGroup'
 import { ExerciseCard } from '@components/ExerciseCard'
 
-export const Home = () => {
-  const exercises = [
-    {
-      name: 'Supino reto',
-      series: '4 séries de 10 repetições',
-    },
-    {
-      name: 'Puxada frontal',
-      series: '4 séries de 10 repetições',
-    },
-    {
-      name: 'Leg press',
-      series: '4 séries de 10 repetições',
-    },
-    {
-      name: 'Desenvolvimento',
-      series: '4 séries de 10 repetições',
-    },
-    {
-      name: 'Rosca direta',
-      series: '4 séries de 10 repetições',
-    },
-    {
-      name: 'Tríceps testa',
-      series: '4 séries de 10 repetições',
-    },
-    {
-      name: 'Abdominal',
-      series: '4 séries de 10 repetições',
-    },
-  ]
+import { AppNavigationRouteProps } from '@routes/app/types'
 
-  const groups = [
-    'Peito',
-    'Costas',
-    'Pernas',
-    'Ombros',
-    'Bíceps',
-    'Tríceps',
-    'Abdômen',
-  ]
+const exercises = [
+  {
+    name: 'Supino reto',
+    series: '4 séries de 10 repetições',
+  },
+  {
+    name: 'Puxada frontal',
+    series: '4 séries de 10 repetições',
+  },
+  {
+    name: 'Leg press',
+    series: '4 séries de 10 repetições',
+  },
+  {
+    name: 'Desenvolvimento',
+    series: '4 séries de 10 repetições',
+  },
+  {
+    name: 'Rosca direta',
+    series: '4 séries de 10 repetições',
+  },
+  {
+    name: 'Tríceps testa',
+    series: '4 séries de 10 repetições',
+  },
+  {
+    name: 'Abdominal',
+    series: '4 séries de 10 repetições',
+  },
+]
+
+const groups = [
+  'Peito',
+  'Costas',
+  'Pernas',
+  'Ombros',
+  'Bíceps',
+  'Tríceps',
+  'Abdômen',
+]
+
+export const Home = () => {
+  const navigation = useNavigation<AppNavigationRouteProps>()
 
   const [groupeSelected, setGroupeSelected] = useState('Costas')
+
+  const handleOpenExerciseDetails = () => {
+    navigation.navigate('exercise')
+  }
 
   return (
     <VStack flex={1}>
@@ -85,7 +94,11 @@ export const Home = () => {
           data={exercises}
           keyExtractor={(item) => item.name}
           renderItem={({ item }) => (
-            <ExerciseCard name={item.name} series={item.series} />
+            <ExerciseCard
+              name={item.name}
+              series={item.series}
+              onPress={handleOpenExerciseDetails}
+            />
           )}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 24 }}
