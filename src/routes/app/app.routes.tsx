@@ -50,19 +50,6 @@ export const AppRoutes = () => {
       }}
     >
       <Screen
-        name="home"
-        component={Home}
-        options={{
-          tabBarIcon: ({ color }) => (
-            <AppRoutesIcons.home
-              fill={color}
-              width={iconSize}
-              height={iconSize}
-            />
-          ),
-        }}
-      />
-      <Screen
         name="history"
         component={History}
         options={{
@@ -75,6 +62,20 @@ export const AppRoutes = () => {
           ),
         }}
       />
+      <Screen
+        name="home"
+        component={Home}
+        options={{
+          tabBarIcon: ({ color }) => (
+            <AppRoutesIcons.home
+              fill={color}
+              width={iconSize}
+              height={iconSize}
+            />
+          ),
+        }}
+      />
+
       <Screen
         name="profile"
         component={Profile}
