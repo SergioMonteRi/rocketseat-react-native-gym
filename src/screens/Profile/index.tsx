@@ -1,12 +1,66 @@
+import { useState } from 'react'
+import * as FileSystem from 'expo-file-system'
+import * as ImagePicker from 'expo-image-picker'
 import { ScrollView, TouchableOpacity } from 'react-native'
-import { Center, Heading, Text, VStack } from '@gluestack-ui/themed'
+import { Center, Heading, Text, VStack, useToast } from '@gluestack-ui/themed'
 
 import { Input } from '@components/Input'
+import { Button } from '@components/Button'
 import { UserPhoto } from '@components/UserPhoto'
 import { ScreenHeader } from '@components/ScreenHeader'
-import { Button } from '@components/Button'
+import { ToastMessage } from '@components/ToastMessage'
 
 export const Profile = () => {
+  const [userPhoto, setUserPhoto] = useState<string>(
+    'https://github.com/sergiomonteri.png',
+  )
+
+  const toast = useToast()
+
+  const handleUserPhotoSelect = async () => {
+    try {
+      const selectedPhoto = await ImagePicker.launchImageLibraryAsync({
+        quality: 1,
+        aspect: [4, 4],
+        allowsEditing: true,
+        mediaTypes: ['images'],
+      })
+
+      if (selectedPhoto.canceled) {
+        return
+      }
+
+      const photoURI = selectedPhoto.assets[0].uri
+
+      if (photoURI) {
+        const photoInfo = (await FileSystem.getInfoAsync(photoURI)) as {
+          size: number
+        }
+
+        if (photoInfo.size && photoInfo.size / 1024 / 1024 > 5) {
+          return toast.show({
+            placement: 'top',
+            render: ({ id }) => (
+              <ToastMessage
+                id={id}
+                type={'error'}
+                title={'Erro ao selecionar a foto'}
+                description={
+                  'A imagem selecionada é muito grande. Por favor, selecione uma imagem com até 5MB.'
+                }
+                onClose={() => toast.close(id)}
+              />
+            ),
+          })
+        }
+
+        setUserPhoto(photoURI)
+      }
+    } catch (error) {
+      console.error('Erro ao selecionar a foto', error)
+    }
+  }
+
   return (
     <VStack flex={1}>
       <ScreenHeader title={'Perfil'} />
@@ -16,10 +70,10 @@ export const Profile = () => {
           <UserPhoto
             size={'xl'}
             alt={'Foto de perfil'}
-            source={{ uri: 'https://github.com/sergiomonteri.png' }}
+            source={{ uri: userPhoto }}
           />
 
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleUserPhotoSelect}>
             <Text
               mt={'$2'}
               mb={'$8'}

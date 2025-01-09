@@ -16,6 +16,7 @@ export const HistoryCard = () => {
         <Heading
           color={'$white'}
           fontSize={'$md'}
+          numberOfLines={1}
           fontFamily={'$heading'}
           textTransform={'capitalize'}
         >
