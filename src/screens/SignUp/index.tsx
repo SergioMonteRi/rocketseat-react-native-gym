@@ -9,7 +9,10 @@ import {
   Center,
   Heading,
   ScrollView,
+  useToast,
 } from '@gluestack-ui/themed'
+
+import { api } from '@services/api'
 
 import { Input } from '@components/Input'
 import { Button } from '@components/Button'
@@ -20,8 +23,11 @@ import { signUpSchema } from './formSchema'
 
 import Logo from '@assets/logo.svg'
 import BackgroundImg from '@assets/background.png'
+import { AppError } from '@utils/AppError'
+import { ToastMessage } from '@components/ToastMessage'
 
 export const SignUp = () => {
+  const toast = useToast()
   const navigator = useNavigation()
 
   const {
@@ -36,8 +42,29 @@ export const SignUp = () => {
     navigator.goBack()
   }
 
-  const onSubmit = (data: SignUpFormData) => {
-    console.log(data)
+  const onSubmit = async ({ name, email, password }: SignUpFormData) => {
+    try {
+      const response = await api.post('/users', { name, email, password })
+
+      console.log(response)
+    } catch (error) {
+      const isAppError = error instanceof AppError
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível criar a conta. Tente novamente mais tarde'
+
+      toast.show({
+        placement: 'top',
+        render: ({ id }) => (
+          <ToastMessage
+            id={id}
+            title={title}
+            type={'error'}
+            onClose={() => toast.close(id)}
+          />
+        ),
+      })
+    }
   }
 
   return (
