@@ -18,7 +18,7 @@ const api = axios.create({
 
 api.interceptors.response.use(
   (response) => {
-    console.info('interceptor response', response)
+    // console.info('interceptor response', response)
 
     return response
   },

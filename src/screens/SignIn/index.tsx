@@ -1,6 +1,9 @@
+import { useState } from 'react'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { Controller, useForm } from 'react-hook-form'
 import { useNavigation } from '@react-navigation/native'
-
 import {
+  Box,
   Text,
   Image,
   VStack,
@@ -14,14 +17,49 @@ import { Button } from '@components/Button'
 
 import { AuthNavigationRouteProps } from '@routes/auth/types'
 
+import { useAuth } from '@hooks/useAuth'
+import { useCustomToast } from '@hooks/useCustomToast'
+
 import Logo from '@assets/logo.svg'
 import BackgroundImg from '@assets/background.png'
+
+import { signInSchema } from './formSchema'
+
+import { SignInFormData } from './types'
 
 export const SignIn = () => {
   const navigator = useNavigation<AuthNavigationRouteProps>()
 
+  const { signIn } = useAuth()
+  const { showToast } = useCustomToast()
+  const [isSigningIn, setIsSigningIn] = useState(false)
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignInFormData>({
+    resolver: yupResolver(signInSchema),
+  })
+
   const handleNewAccount = () => {
     navigator.navigate('signUp')
+  }
+
+  const onSubmit = async (data: SignInFormData) => {
+    try {
+      setIsSigningIn(true)
+      await signIn(data.email, data.password)
+    } catch (error) {
+      showToast({
+        error,
+        type: 'error',
+        alternativeMessage:
+          'Não foi possível acessar a conta. Tente novamente mais tarde.',
+      })
+    } finally {
+      setIsSigningIn(false)
+    }
   }
 
   return (
@@ -47,18 +85,46 @@ export const SignIn = () => {
             </Text>
           </Center>
 
-          <Center gap={'$2'}>
-            <Heading color={'$gray100'}>Acesse a conta</Heading>
+          <Box gap={'$2'}>
+            <Heading color={'$gray100'} textAlign={'center'}>
+              Acesse a conta
+            </Heading>
 
-            <Input
-              placeholder="Email"
-              autoCapitalize={'none'}
-              keyboardType={'email-address'}
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  value={value}
+                  placeholder="Email"
+                  onChangeText={onChange}
+                  autoCapitalize={'none'}
+                  keyboardType={'email-address'}
+                  errorMessage={errors.email?.message}
+                />
+              )}
             />
-            <Input placeholder="Senha" secureTextEntry />
 
-            <Button title={'Acessar'} />
-          </Center>
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  value={value}
+                  placeholder="Senha"
+                  onChangeText={onChange}
+                  secureTextEntry
+                  errorMessage={errors.password?.message}
+                />
+              )}
+            />
+
+            <Button
+              title={'Acessar'}
+              isLoading={isSigningIn}
+              onPress={handleSubmit(onSubmit)}
+            />
+          </Box>
 
           <Center flex={1} justifyContent={'flex-end'} mt={'$4'}>
             <Text

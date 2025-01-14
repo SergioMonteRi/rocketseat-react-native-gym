@@ -1,5 +1,6 @@
-import { useForm, Controller } from 'react-hook-form'
+import { useState } from 'react'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { useForm, Controller } from 'react-hook-form'
 import { useNavigation } from '@react-navigation/native'
 import {
   Box,
@@ -9,7 +10,6 @@ import {
   Center,
   Heading,
   ScrollView,
-  useToast,
 } from '@gluestack-ui/themed'
 
 import { api } from '@services/api'
@@ -17,18 +17,22 @@ import { api } from '@services/api'
 import { Input } from '@components/Input'
 import { Button } from '@components/Button'
 
-import { SignUpFormData } from './types'
+import { useAuth } from '@hooks/useAuth'
+import { useCustomToast } from '@hooks/useCustomToast'
 
 import { signUpSchema } from './formSchema'
 
+import { SignUpFormData } from './types'
+
 import Logo from '@assets/logo.svg'
 import BackgroundImg from '@assets/background.png'
-import { AppError } from '@utils/AppError'
-import { ToastMessage } from '@components/ToastMessage'
 
 export const SignUp = () => {
-  const toast = useToast()
+  const { signIn } = useAuth()
   const navigator = useNavigation()
+  const { showToast } = useCustomToast()
+
+  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false)
 
   const {
     control,
@@ -44,26 +48,19 @@ export const SignUp = () => {
 
   const onSubmit = async ({ name, email, password }: SignUpFormData) => {
     try {
-      const response = await api.post('/users', { name, email, password })
+      setIsLoadingSubmit(true)
 
-      console.log(response)
+      await api.post('/users', { name, email, password })
+      await signIn(email, password)
     } catch (error) {
-      const isAppError = error instanceof AppError
-      const title = isAppError
-        ? error.message
-        : 'Não foi possível criar a conta. Tente novamente mais tarde'
-
-      toast.show({
-        placement: 'top',
-        render: ({ id }) => (
-          <ToastMessage
-            id={id}
-            title={title}
-            type={'error'}
-            onClose={() => toast.close(id)}
-          />
-        ),
+      showToast({
+        error,
+        type: 'error',
+        alternativeMessage:
+          'Não foi possível criar a conta. Tente novamente mais tarde',
       })
+    } finally {
+      setIsLoadingSubmit(false)
     }
   }
 
@@ -155,6 +152,7 @@ export const SignUp = () => {
 
             <Button
               title={'Criar e acessar'}
+              isLoading={isLoadingSubmit}
               onPress={handleSubmit(onSubmit)}
             />
           </Box>
