@@ -1,76 +1,54 @@
-import { useState } from 'react'
 import { FlatList } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import { useCallback, useEffect, useState } from 'react'
 import { Heading, HStack, Text, VStack } from '@gluestack-ui/themed'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
+
+import { AppNavigationRouteProps } from '@routes/app/types'
+
+import { useMuscleGroups } from '@hooks/useMuscleGroups'
 
 import { HomeHeader } from '@components/HomeHeader'
 import { MuscleGroup } from '@components/MuscleGroup'
 import { ExerciseCard } from '@components/ExerciseCard'
 
-import { AppNavigationRouteProps } from '@routes/app/types'
-
-const exercises = [
-  {
-    name: 'Supino reto',
-    series: '4 séries de 10 repetições',
-  },
-  {
-    name: 'Puxada frontal',
-    series: '4 séries de 10 repetições',
-  },
-  {
-    name: 'Leg press',
-    series: '4 séries de 10 repetições',
-  },
-  {
-    name: 'Desenvolvimento',
-    series: '4 séries de 10 repetições',
-  },
-  {
-    name: 'Rosca direta',
-    series: '4 séries de 10 repetições',
-  },
-  {
-    name: 'Tríceps testa',
-    series: '4 séries de 10 repetições',
-  },
-  {
-    name: 'Abdominal',
-    series: '4 séries de 10 repetições',
-  },
-]
-
-const groups = [
-  'Peito',
-  'Costas',
-  'Pernas',
-  'Ombros',
-  'Bíceps',
-  'Tríceps',
-  'Abdômen',
-]
-
 export const Home = () => {
   const navigation = useNavigation<AppNavigationRouteProps>()
 
-  const [groupeSelected, setGroupeSelected] = useState('Costas')
+  const {
+    muscleGroups,
+    exerciseByGroup,
+    loadMuscleGroups,
+    loadExercisesByGroup,
+  } = useMuscleGroups()
+
+  const [groupSelected, setGroupSelected] = useState('antebraço')
 
   const handleOpenExerciseDetails = () => {
     navigation.navigate('exercise')
   }
+
+  useEffect(() => {
+    loadMuscleGroups()
+  }, [loadMuscleGroups])
+
+  useFocusEffect(
+    useCallback(() => {
+      loadExercisesByGroup(groupSelected)
+    }, [groupSelected, loadExercisesByGroup]),
+  )
 
   return (
     <VStack flex={1}>
       <HomeHeader />
 
       <FlatList
-        data={groups}
+        data={muscleGroups}
         keyExtractor={(item) => item}
         renderItem={({ item }) => (
           <MuscleGroup
             name={item}
-            isActive={groupeSelected.toLowerCase() === item.toLowerCase()}
-            onPress={() => setGroupeSelected(item)}
+            isActive={groupSelected.toLowerCase() === item.toLowerCase()}
+            onPress={() => setGroupSelected(item)}
           />
         )}
         horizontal
@@ -86,19 +64,15 @@ export const Home = () => {
           </Heading>
 
           <Text color={'$gray200'} fontSize={'$sm'} fontFamily={'$body'}>
-            {exercises.length}
+            {exerciseByGroup.length}
           </Text>
         </HStack>
 
         <FlatList
-          data={exercises}
-          keyExtractor={(item) => item.name}
+          data={exerciseByGroup}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <ExerciseCard
-              name={item.name}
-              series={item.series}
-              onPress={handleOpenExerciseDetails}
-            />
+            <ExerciseCard exercise={item} onPress={handleOpenExerciseDetails} />
           )}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 24 }}

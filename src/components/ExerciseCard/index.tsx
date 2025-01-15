@@ -10,9 +10,13 @@ import {
 import { ChevronRight } from 'lucide-react-native'
 
 import { ExerciseCardProps } from './types'
+import { api } from '@services/api'
 
 export const ExerciseCard = (props: ExerciseCardProps) => {
-  const { name, series, ...rest } = props
+  const { exercise, ...rest } = props
+  const { name, series, repetitions, thumb } = exercise
+
+  console.log(exercise)
 
   return (
     <TouchableOpacity {...rest}>
@@ -27,7 +31,7 @@ export const ExerciseCard = (props: ExerciseCardProps) => {
         <Image
           alt={'Gym exercise'}
           source={{
-            uri: 'https://img.freepik.com/vetores-gratis/mulher-levantando-peso_24908-81253.jpg',
+            uri: `${api.defaults.baseURL}/exercise/thumb/${thumb}`,
           }}
           w={'$16'}
           h={'$16'}
@@ -46,7 +50,7 @@ export const ExerciseCard = (props: ExerciseCardProps) => {
             color={'$gray200'}
             fontFamily={'$body'}
           >
-            {series}
+            {series} séries X {repetitions} repetições
           </Text>
         </VStack>
 
