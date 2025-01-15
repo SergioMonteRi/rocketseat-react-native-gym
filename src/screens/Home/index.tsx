@@ -5,6 +5,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native'
 
 import { AppNavigationRouteProps } from '@routes/app/types'
 
+import { useExercise } from '@hooks/useExercise'
 import { useMuscleGroups } from '@hooks/useMuscleGroups'
 
 import { HomeHeader } from '@components/HomeHeader'
@@ -14,17 +15,13 @@ import { ExerciseCard } from '@components/ExerciseCard'
 export const Home = () => {
   const navigation = useNavigation<AppNavigationRouteProps>()
 
-  const {
-    muscleGroups,
-    exerciseByGroup,
-    loadMuscleGroups,
-    loadExercisesByGroup,
-  } = useMuscleGroups()
+  const { muscleGroups, loadMuscleGroups } = useMuscleGroups()
+  const { exerciseByGroup, loadExercisesByGroup } = useExercise()
 
   const [groupSelected, setGroupSelected] = useState('antebraço')
 
-  const handleOpenExerciseDetails = () => {
-    navigation.navigate('exercise')
+  const handleOpenExerciseDetails = (exerciseId: number) => {
+    navigation.navigate('exercise', { exerciseId })
   }
 
   useEffect(() => {
@@ -72,7 +69,10 @@ export const Home = () => {
           data={exerciseByGroup}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <ExerciseCard exercise={item} onPress={handleOpenExerciseDetails} />
+            <ExerciseCard
+              exercise={item}
+              onPress={() => handleOpenExerciseDetails(item.id)}
+            />
           )}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 24 }}

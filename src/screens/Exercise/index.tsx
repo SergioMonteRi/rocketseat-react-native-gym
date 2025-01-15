@@ -1,29 +1,59 @@
+import { useEffect } from 'react'
 import { TouchableOpacity } from 'react-native'
 import { ArrowLeft } from 'lucide-react-native'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import {
-  VStack,
+  Box,
   Text,
   Icon,
-  HStack,
-  Heading,
   Image,
-  Box,
+  HStack,
+  VStack,
+  Heading,
   ScrollView,
 } from '@gluestack-ui/themed'
 
+import { useExercise } from '@hooks/useExercise'
+
+import { Button } from '@components/Button'
+import { Loading } from '@components/Loading'
+
+import { api } from '@services/api'
+
 import { AppNavigationRouteProps } from '@routes/app/types'
+
+import { ExerciseRouteParams } from './types'
 
 import BodySVG from '@assets/body.svg'
 import Series from '@assets/series.svg'
 import Repetitions from '@assets/repetitions.svg'
-import { Button } from '@components/Button'
 
 export const Exercise = () => {
   const navigation = useNavigation<AppNavigationRouteProps>()
 
+  const route = useRoute()
+  const { exerciseId } = route.params as ExerciseRouteParams
+
+  const {
+    exerciseDetails,
+    isExerciseDetailsLoading,
+    isExerciseCompletionLoading,
+    loadExerciseDetails,
+    registerExerciseHistory,
+  } = useExercise()
+
+  const { name, group, series, repetitions, demo } = exerciseDetails
+
   const handleGoBack = () => {
     navigation.goBack()
+  }
+
+  useEffect(() => {
+    loadExerciseDetails(exerciseId)
+  }, [exerciseId, loadExerciseDetails])
+
+  if (isExerciseDetailsLoading) {
+    return <Loading />
   }
 
   return (
@@ -45,13 +75,13 @@ export const Exercise = () => {
             color={'$gray100'}
             fontFamily={'$heading'}
           >
-            Puxada frontal
+            {name}
           </Heading>
 
           <HStack alignItems={'center'}>
             <BodySVG />
             <Text color={'$gray200'} ml={'$1'} textTransform={'capitalize'}>
-              Costas
+              {group}
             </Text>
           </HStack>
         </HStack>
@@ -64,7 +94,7 @@ export const Exercise = () => {
         <VStack p={'$8'} rowGap={'$4'}>
           <Image
             source={{
-              uri: 'https://img.freepik.com/vetores-gratis/mulher-levantando-peso_24908-81253.jpg',
+              uri: `${api.defaults.baseURL}/exercise/demo/${demo}`,
             }}
             w={'$full'}
             h={'$80'}
@@ -78,18 +108,22 @@ export const Exercise = () => {
               <HStack columnGap={'$2'}>
                 <Series />
                 <Text color={'$gray100'} fontFamily={'$body'} fontSize={'$lg'}>
-                  3 séries
+                  {series} séries
                 </Text>
               </HStack>
               <HStack columnGap={'$2'}>
                 <Repetitions />
                 <Text color={'$gray100'} fontFamily={'$body'} fontSize={'$lg'}>
-                  12 repetições
+                  {repetitions} repetições
                 </Text>
               </HStack>
             </HStack>
 
-            <Button title={'Marcar como realizado'} />
+            <Button
+              title={'Marcar como realizado'}
+              isLoading={isExerciseCompletionLoading}
+              onPress={() => registerExerciseHistory(exerciseId)}
+            />
           </Box>
         </VStack>
       </ScrollView>

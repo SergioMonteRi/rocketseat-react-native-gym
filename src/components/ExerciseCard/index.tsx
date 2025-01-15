@@ -16,8 +16,6 @@ export const ExerciseCard = (props: ExerciseCardProps) => {
   const { exercise, ...rest } = props
   const { name, series, repetitions, thumb } = exercise
 
-  console.log(exercise)
-
   return (
     <TouchableOpacity {...rest}>
       <HStack
