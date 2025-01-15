@@ -11,6 +11,12 @@ import {
   storageUserRemove,
 } from '@storage/user/storageUser'
 
+import {
+  storageAuthTokenGet,
+  storageAuthTokenSave,
+  storageAuthTokenRemove,
+} from '@storage/authToken/storageAuthToken'
+
 import { AuthContextDataProps, AuthContextProviderProps } from './types'
 
 export const AuthContext = createContext<AuthContextDataProps>(
@@ -21,36 +27,59 @@ export const AuthContexProvider = ({ children }: AuthContextProviderProps) => {
   const [user, setUser] = useState<UserDTO>({} as UserDTO)
   const [isLoadingUserStorageData, setIsLoadingUserStorageData] = useState(true)
 
-  const signIn = useCallback(async (email: string, password: string) => {
-    const { data } = await api.post<SignInDTO>('/sessions', { email, password })
+  const userAndTokenUpdate = useCallback((userData: UserDTO, token: string) => {
+    api.defaults.headers.common.Authorization = `Bearer ${token}`
 
-    if (data?.user) {
-      setUser(data.user)
-      storageUserSave(data.user)
-      return data.user
-    }
-
-    return undefined
+    setUser(userData)
   }, [])
+
+  const storageUserAndTokenSave = useCallback(
+    async (userData: UserDTO, token: string) => {
+      await storageUserSave(userData)
+      await storageAuthTokenSave(token)
+    },
+    [],
+  )
+
+  const signIn = useCallback(
+    async (email: string, password: string) => {
+      const { data } = await api.post<SignInDTO>('/sessions', {
+        email,
+        password,
+      })
+
+      if (data?.user && data?.token) {
+        const { user: userData, token } = data
+
+        await storageUserAndTokenSave(userData, token)
+        userAndTokenUpdate(userData, token)
+      }
+    },
+    [storageUserAndTokenSave, userAndTokenUpdate],
+  )
 
   const loadUserData = useCallback(async () => {
     try {
       setIsLoadingUserStorageData(true)
-      const user = await storageUserGet()
 
-      if (user) {
-        setUser(user)
+      const userData = await storageUserGet()
+      const authToken = await storageAuthTokenGet()
+
+      if (userData && authToken) {
+        userAndTokenUpdate(userData, authToken)
       }
     } finally {
       setIsLoadingUserStorageData(false)
     }
-  }, [])
+  }, [userAndTokenUpdate])
 
   const singOut = useCallback(async () => {
     try {
       setIsLoadingUserStorageData(true)
 
       await storageUserRemove()
+      await storageAuthTokenRemove()
+
       setUser({} as UserDTO)
     } finally {
       setIsLoadingUserStorageData(false)

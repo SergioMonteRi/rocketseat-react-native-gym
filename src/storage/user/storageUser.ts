@@ -20,7 +20,7 @@ export const storageUserGet = async () => {
 
     return user
   } catch (error) {
-    console.log(error)
+    console.log('storageUserGet', error)
   }
 }
 
@@ -28,6 +28,6 @@ export const storageUserRemove = async () => {
   try {
     await AsyncStorage.removeItem(STORAGE_USER_DATA)
   } catch (error) {
-    console.log(error)
+    console.log('storageUserRemove', error)
   }
 }
