@@ -4,3 +4,9 @@ export type UserDTO = {
   email: string
   avatar: string
 }
+
+export type UserProfileUpdateDTO = {
+  name: string
+  password: string
+  old_password: string
+}

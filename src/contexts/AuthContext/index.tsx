@@ -86,13 +86,24 @@ export const AuthContexProvider = ({ children }: AuthContextProviderProps) => {
     }
   }, [])
 
+  const updateUserData = useCallback(async (userUpdatedData: UserDTO) => {
+    setUser(userUpdatedData)
+    await storageUserSave(userUpdatedData)
+  }, [])
+
   useEffect(() => {
     loadUserData()
   }, [loadUserData])
 
   return (
     <AuthContext.Provider
-      value={{ user, isLoadingUserStorageData, signIn, singOut }}
+      value={{
+        user,
+        isLoadingUserStorageData,
+        signIn,
+        singOut,
+        updateUserData,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -5,6 +5,7 @@ export type AuthContextDataProps = {
   isLoadingUserStorageData: boolean
   singOut: () => Promise<void>
   signIn: (email: string, password: string) => void
+  updateUserData: (userUpdatedData: UserDTO) => Promise<void>
 }
 
 export type AuthContextProviderProps = {

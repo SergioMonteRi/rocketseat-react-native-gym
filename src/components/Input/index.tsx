@@ -24,6 +24,7 @@ export const Input = (props: InputProps) => {
     <FormControl isInvalid={isInvalid} mb={'$2'}>
       <GluestackInput
         h={'$14'}
+        w={'$full'}
         borderWidth={'$0'}
         borderRadius={'$md'}
         isInvalid={isInvalid}
