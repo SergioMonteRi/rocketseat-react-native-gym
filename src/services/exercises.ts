@@ -1,5 +1,6 @@
-import { ExerciseDTO } from '@dtos/ExerciseDTO'
 import { api } from './api'
+
+import { ExerciseDTO, ExerciseHistoryDTO } from '@dtos/ExerciseDTO'
 
 export const fetchExerciseById = async (
   exerciseId: number,
@@ -21,4 +22,10 @@ export const fetchExerciseByGroup = async (
 
 export const fetchCompleteExercise = async (exerciseId: number) => {
   await api.post('/history', { exercise_id: exerciseId })
+}
+
+export const fetchExerciseHistory = async (): Promise<ExerciseHistoryDTO[]> => {
+  const { data } = await api.get<ExerciseHistoryDTO[]>('/history')
+
+  return data
 }

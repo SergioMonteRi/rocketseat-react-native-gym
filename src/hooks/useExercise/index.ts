@@ -5,19 +5,25 @@ import { useCustomToast } from '@hooks/useCustomToast'
 import {
   fetchExerciseById,
   fetchExerciseByGroup,
+  fetchExerciseHistory,
   fetchCompleteExercise,
 } from '@services/exercises'
 
-import { ExerciseDTO } from '@dtos/ExerciseDTO'
+import { ExerciseDTO, ExerciseHistoryDTO } from '@dtos/ExerciseDTO'
 
 export const useExercise = () => {
   const { showToast } = useCustomToast()
 
   const [exerciseByGroup, setExerciseByGroup] = useState<ExerciseDTO[]>([])
+  const [exerciseHistory, setExerciseHistory] = useState<ExerciseHistoryDTO[]>(
+    [],
+  )
   const [exerciseDetails, setExerciseDetails] = useState<ExerciseDTO>(
     {} as ExerciseDTO,
   )
 
+  const [isExerciseHistoryLoading, setIsExerciseHistoryLoading] =
+    useState(false)
   const [isExerciseDetailsLoading, setIsExerciseDetailsLoading] =
     useState(false)
   const [isExercisesByGroupLoading, setIsExercisesByGroupLoading] =
@@ -92,13 +98,35 @@ export const useExercise = () => {
     [showToast],
   )
 
+  const loadExerciseHistory = useCallback(async () => {
+    setIsExerciseHistoryLoading(true)
+
+    try {
+      const response = await fetchExerciseHistory()
+
+      setExerciseHistory(response)
+    } catch (error) {
+      showToast({
+        error,
+        type: 'error',
+        alternativeMessage:
+          'Não foi possível carregar o histórico de exercícios.',
+      })
+    } finally {
+      setIsExerciseHistoryLoading(false)
+    }
+  }, [showToast])
+
   return {
     exerciseByGroup,
     exerciseDetails,
+    exerciseHistory,
+    isExerciseHistoryLoading,
     isExerciseDetailsLoading,
     isExercisesByGroupLoading,
     isExerciseCompletionLoading,
     loadExerciseDetails,
+    loadExerciseHistory,
     loadExercisesByGroup,
     registerExerciseHistory,
   }

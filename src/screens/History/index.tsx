@@ -1,20 +1,27 @@
 import { SectionList } from 'react-native'
 import { Heading, Text, VStack } from '@gluestack-ui/themed'
 
+import { useExercise } from '@hooks/useExercise'
+
 import { HistoryCard } from '@components/HistoryCard'
 import { ScreenHeader } from '@components/ScreenHeader'
+import { useFocusEffect } from '@react-navigation/native'
+import { useCallback } from 'react'
+import { Loading } from '@components/Loading'
 
 export const History = () => {
-  const exerciseHistory = [
-    {
-      title: '26.08.22',
-      data: ['Puxada frontal', 'Rosca direta', 'Rosca alternada'],
-    },
-    {
-      title: '27.08.22',
-      data: ['Puxada frontal', 'Rosca direta', 'Rosca alternada'],
-    },
-  ]
+  const { exerciseHistory, isExerciseHistoryLoading, loadExerciseHistory } =
+    useExercise()
+
+  useFocusEffect(
+    useCallback(() => {
+      loadExerciseHistory()
+    }, [loadExerciseHistory]),
+  )
+
+  if (isExerciseHistoryLoading) {
+    return <Loading />
+  }
 
   return (
     <VStack flex={1}>
@@ -22,8 +29,8 @@ export const History = () => {
 
       <SectionList
         sections={exerciseHistory}
-        keyExtractor={(item, index) => item + index}
-        renderItem={() => <HistoryCard />}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => <HistoryCard exercise={item} />}
         renderSectionHeader={({ section: { title } }) => (
           <Heading
             mb={'$3'}

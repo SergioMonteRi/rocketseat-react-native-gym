@@ -1,6 +1,11 @@
 import { Heading, HStack, Text, VStack } from '@gluestack-ui/themed'
 
-export const HistoryCard = () => {
+import { HistoryCardProps } from './types'
+
+export const HistoryCard = (props: HistoryCardProps) => {
+  const { exercise } = props
+  const { name, group, hour } = exercise
+
   return (
     <HStack
       px={'$5'}
@@ -20,15 +25,15 @@ export const HistoryCard = () => {
           fontFamily={'$heading'}
           textTransform={'capitalize'}
         >
-          Costas
+          {group}
         </Heading>
         <Text color={'$gray100'} fontSize={'$lg'}>
-          Puxada frontal
+          {name}
         </Text>
       </VStack>
 
       <Text color={'$gray300'} fontSize={'$md'}>
-        08:56
+        {hour}
       </Text>
     </HStack>
   )
