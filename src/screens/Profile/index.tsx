@@ -1,10 +1,9 @@
-import { useState } from 'react'
-import * as FileSystem from 'expo-file-system'
-import * as ImagePicker from 'expo-image-picker'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Controller, useForm } from 'react-hook-form'
 import { ScrollView, TouchableOpacity } from 'react-native'
-import { Center, Heading, Text, VStack, useToast } from '@gluestack-ui/themed'
+import { Center, Heading, Text, VStack } from '@gluestack-ui/themed'
+
+import { api } from '@services/api'
 
 import { useAuth } from '@hooks/useAuth'
 import { useProfile } from '@hooks/useProfile'
@@ -13,20 +12,19 @@ import { Input } from '@components/Input'
 import { Button } from '@components/Button'
 import { UserPhoto } from '@components/UserPhoto'
 import { ScreenHeader } from '@components/ScreenHeader'
-import { ToastMessage } from '@components/ToastMessage'
 
 import { profileSchema } from './formSchema'
 
 import { ProfileFormData } from './types'
 
-export const Profile = () => {
-  const toast = useToast()
-  const { user } = useAuth()
-  const { isProfileDataUpdating, updateUserProfileData } = useProfile()
+import defaultUserPhoto from '@assets/userPhotoDefault.png'
 
-  const [userPhoto, setUserPhoto] = useState<string>(
-    'https://github.com/sergiomonteri.png',
-  )
+export const Profile = () => {
+  const { user } = useAuth()
+  const { isProfileDataUpdating, updateUserPhoto, updateUserProfileData } =
+    useProfile()
+
+  const { avatar } = user
 
   const {
     control,
@@ -38,50 +36,6 @@ export const Profile = () => {
     },
     resolver: yupResolver(profileSchema),
   })
-
-  const handleUserPhotoSelect = async () => {
-    try {
-      const selectedPhoto = await ImagePicker.launchImageLibraryAsync({
-        quality: 1,
-        aspect: [4, 4],
-        allowsEditing: true,
-        mediaTypes: ['images'],
-      })
-
-      if (selectedPhoto.canceled) {
-        return
-      }
-
-      const photoURI = selectedPhoto.assets[0].uri
-
-      if (photoURI) {
-        const photoInfo = (await FileSystem.getInfoAsync(photoURI)) as {
-          size: number
-        }
-
-        if (photoInfo.size && photoInfo.size / 1024 / 1024 > 5) {
-          return toast.show({
-            placement: 'top',
-            render: ({ id }) => (
-              <ToastMessage
-                id={id}
-                type={'error'}
-                title={'Erro ao selecionar a foto'}
-                description={
-                  'A imagem selecionada é muito grande. Por favor, selecione uma imagem com até 5MB.'
-                }
-                onClose={() => toast.close(id)}
-              />
-            ),
-          })
-        }
-
-        setUserPhoto(photoURI)
-      }
-    } catch (error) {
-      console.error('Erro ao selecionar a foto', error)
-    }
-  }
 
   const handleProfileUpdate = async (data: ProfileFormData) => {
     await updateUserProfileData(data)
@@ -96,10 +50,14 @@ export const Profile = () => {
           <UserPhoto
             size={'xl'}
             alt={'Foto de perfil'}
-            source={{ uri: userPhoto }}
+            source={
+              avatar
+                ? { uri: `${api.defaults.baseURL}/avatar/${avatar}` }
+                : defaultUserPhoto
+            }
           />
 
-          <TouchableOpacity onPress={handleUserPhotoSelect}>
+          <TouchableOpacity onPress={updateUserPhoto}>
             <Text
               mt={'$2'}
               mb={'$8'}
