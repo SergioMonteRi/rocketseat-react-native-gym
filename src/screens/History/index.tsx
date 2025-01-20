@@ -1,13 +1,13 @@
+import { useCallback } from 'react'
 import { SectionList } from 'react-native'
+import { useFocusEffect } from '@react-navigation/native'
 import { Heading, Text, VStack } from '@gluestack-ui/themed'
 
 import { useExercise } from '@hooks/useExercise'
 
+import { Loading } from '@components/Loading'
 import { HistoryCard } from '@components/HistoryCard'
 import { ScreenHeader } from '@components/ScreenHeader'
-import { useFocusEffect } from '@react-navigation/native'
-import { useCallback } from 'react'
-import { Loading } from '@components/Loading'
 
 export const History = () => {
   const { exerciseHistory, isExerciseHistoryLoading, loadExerciseHistory } =

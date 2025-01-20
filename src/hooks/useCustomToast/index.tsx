@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import { useToast } from '@gluestack-ui/themed'
 
 import { AppError } from '@utils/AppError'
@@ -5,7 +6,6 @@ import { AppError } from '@utils/AppError'
 import { ToastMessage } from '@components/ToastMessage'
 
 import { ShowToastProps } from './types'
-import { useCallback } from 'react'
 
 export const useCustomToast = () => {
   const toast = useToast()

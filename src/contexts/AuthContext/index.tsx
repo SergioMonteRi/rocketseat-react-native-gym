@@ -34,9 +34,9 @@ export const AuthContexProvider = ({ children }: AuthContextProviderProps) => {
   }, [])
 
   const storageUserAndTokenSave = useCallback(
-    async (userData: UserDTO, token: string) => {
+    async (userData: UserDTO, token: string, refreshToken: string) => {
       await storageUserSave(userData)
-      await storageAuthTokenSave(token)
+      await storageAuthTokenSave({ token, refreshToken })
     },
     [],
   )
@@ -48,10 +48,11 @@ export const AuthContexProvider = ({ children }: AuthContextProviderProps) => {
         password,
       })
 
-      if (data?.user && data?.token) {
-        const { user: userData, token } = data
+      if (data?.user && data?.token && data?.refresh_token) {
+        // eslint-disable-next-line camelcase
+        const { user: userData, token, refresh_token } = data
 
-        await storageUserAndTokenSave(userData, token)
+        await storageUserAndTokenSave(userData, token, refresh_token)
         userAndTokenUpdate(userData, token)
       }
     },
@@ -66,7 +67,7 @@ export const AuthContexProvider = ({ children }: AuthContextProviderProps) => {
       const authToken = await storageAuthTokenGet()
 
       if (userData && authToken) {
-        userAndTokenUpdate(userData, authToken)
+        userAndTokenUpdate(userData, authToken.token)
       }
     } finally {
       setIsLoadingUserStorageData(false)
@@ -94,6 +95,12 @@ export const AuthContexProvider = ({ children }: AuthContextProviderProps) => {
   useEffect(() => {
     loadUserData()
   }, [loadUserData])
+
+  useEffect(() => {
+    const subscribe = api.registerInterceptTokenManager(singOut)
+
+    return () => subscribe()
+  }, [singOut])
 
   return (
     <AuthContext.Provider
